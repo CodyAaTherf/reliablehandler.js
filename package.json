@@ -1,0 +1,36 @@
+{
+  "name": "reliablehandler",
+  "version": "1.0.0",
+  "description": "some random discord.js cmd handler ok bye",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1" ,
+    "tsc": "tsc -w --outDir dist --rootDir src --skipLibCheck" ,
+    "compile": "tsc && node dist/index.js" ,
+    "dev": "nodemon -e ts --exec \"npm run compile\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodyAaTherf/reliablehandler.js.git"
+  },
+  "keywords": [
+    "discord.js",
+    "discord",
+    "js",
+    "javascript",
+    "cmd",
+    "command",
+    "commandhandler",
+    "commands",
+    "easy"
+  ],
+  "author": "AaTherf",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CodyAaTherf/reliablehandler.js/issues"
+  },
+  "homepage": "https://github.com/CodyAaTherf/reliablehandler.js#readme",
+  "dependencies": {
+    "discord.js": "^13.6.0"
+  }
+}
