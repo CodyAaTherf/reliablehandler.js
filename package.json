@@ -4,9 +4,9 @@
   "description": "some random discord.js cmd handler ok bye",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1" ,
-    "tsc": "tsc -w --outDir dist --rootDir src --skipLibCheck" ,
-    "compile": "tsc && node dist/index.js" ,
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc -w --outDir dist --rootDir src --skipLibCheck",
+    "compile": "tsc && node dist/index.js",
     "dev": "nodemon -e ts --exec \"npm run compile\""
   },
   "repository": {
@@ -32,5 +32,8 @@
   "homepage": "https://github.com/CodyAaTherf/reliablehandler.js#readme",
   "dependencies": {
     "discord.js": "^13.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.23"
   }
 }

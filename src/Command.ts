@@ -2,34 +2,39 @@ import { Client , GuildMember , Message } from 'discord.js'
 import ReliableHandler from "."
 
 interface configuration{
-    aliases: string[] | string
+    names: string[] | string
     minArgs?: number
     maxArgs?: number
     expectedArgs: string
+    description?: string
     callback: Function
 }
 
 class Command {
     private instance: ReliableHandler
     private client: Client
-    private _aliases: string[] = []
+    private _names: string[] = []
     private _minArgs: number = 0
     private _maxArgs: number = -1
     private _expectedArgs?: string
+    private _description?: string
     private _cooldown: string[] = []
     private _callback: Function = () => {}
 
     constructor(
         instance: ReliableHandler ,
         client: Client ,
-        { aliases , minArgs , maxArgs , expectedArgs , callback }: configuration
+        names: string ,
+        callback: Function ,
+        { minArgs , maxArgs , expectedArgs , description }: configuration
     ){
         this.instance = instance
         this.client = client
-        this._aliases = typeof aliases === 'string' ? [aliases] : aliases
+        this._names = typeof names === 'string' ? [names] : names
         this._minArgs = minArgs || 0
         this._maxArgs = maxArgs || -1
         this._expectedArgs = expectedArgs
+        this._description = description
         this._callback = callback
     }
 
@@ -45,8 +50,8 @@ class Command {
         )
     }
 
-    public get aliases(): string[] {
-        return this._aliases
+    public get names(): string[] {
+        return this._names
     }
 
     public get minArgs(): number {
@@ -58,7 +63,11 @@ class Command {
     }
 
     public get expectedArgs(): string | undefined {
-        return this.expectedArgs
+        return this._expectedArgs
+    }
+
+    public get description(): string | undefined {
+        return this._description
     }
 
     public setCooldown(member: GuildMember | string , seconds: number){

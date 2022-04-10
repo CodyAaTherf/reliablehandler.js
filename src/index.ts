@@ -1,5 +1,8 @@
+// 5TH COMMANDSSSSSSEERDDD
+
 import { Client , Guild } from 'discord.js'
 import CommandHandler from './CommandHandler'
+import ICommand from './interfaces/ICommand'
 
 class ReliableHandler {
     private _defaultPrefix = '>'
@@ -7,6 +10,7 @@ class ReliableHandler {
     private _listenersDir = ''
     private _mongo = ''
     private _prefixes: { [name: string]: string } = {}
+    private _commandHandler: CommandHandler
 
     constructor(client: Client , commandsDir?: string , listenerDir?: string){
         if(!client){
@@ -25,7 +29,7 @@ class ReliableHandler {
         }
 
         this._commandsDir = commandsDir || this._commandsDir
-        new CommandHandler(this , client , this._commandsDir)
+        this._commandHandler = new CommandHandler(this , client , this._commandsDir)
     }
 
     public get prefixes(){
@@ -43,6 +47,14 @@ class ReliableHandler {
 
     public getPrefix(guild: Guild | null): string {
         return this._prefixes[guild ? guild.id : ''] || this._defaultPrefix
+    }
+
+    public get commands(): ICommand[]{
+        return this._commandHandler.commands
+    }
+
+    public get commandAmount(): number{
+        return this.commands.length
     }
 }
 
