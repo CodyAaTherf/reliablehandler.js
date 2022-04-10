@@ -1,18 +1,19 @@
 "use strict";
 var Command = /** @class */ (function () {
-    function Command(instance, client, _a) {
-        var aliases = _a.aliases, minArgs = _a.minArgs, maxArgs = _a.maxArgs, expectedArgs = _a.expectedArgs, callback = _a.callback;
-        this._aliases = [];
+    function Command(instance, client, names, callback, _a) {
+        var minArgs = _a.minArgs, maxArgs = _a.maxArgs, expectedArgs = _a.expectedArgs, description = _a.description;
+        this._names = [];
         this._minArgs = 0;
         this._maxArgs = -1;
         this._cooldown = [];
         this._callback = function () { };
         this.instance = instance;
         this.client = client;
-        this._aliases = typeof aliases === 'string' ? [aliases] : aliases;
+        this._names = typeof names === 'string' ? [names] : names;
         this._minArgs = minArgs || 0;
         this._maxArgs = maxArgs || -1;
         this._expectedArgs = expectedArgs;
+        this._description = description;
         this._callback = callback;
     }
     Command.prototype.execute = function (message, args) {
@@ -20,9 +21,9 @@ var Command = /** @class */ (function () {
             ? this.instance.prefixes[message.guild.id]
             : this.instance.defaultPrefix);
     };
-    Object.defineProperty(Command.prototype, "aliases", {
+    Object.defineProperty(Command.prototype, "names", {
         get: function () {
-            return this._aliases;
+            return this._names;
         },
         enumerable: false,
         configurable: true
@@ -43,7 +44,14 @@ var Command = /** @class */ (function () {
     });
     Object.defineProperty(Command.prototype, "expectedArgs", {
         get: function () {
-            return this.expectedArgs;
+            return this._expectedArgs;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Command.prototype, "description", {
+        get: function () {
+            return this._description;
         },
         enumerable: false,
         configurable: true

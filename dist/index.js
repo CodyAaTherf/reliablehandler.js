@@ -1,4 +1,5 @@
 "use strict";
+// 5TH COMMANDSSSSSSEERDDD
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -23,7 +24,7 @@ var ReliableHandler = /** @class */ (function () {
             }
         }
         this._commandsDir = commandsDir || this._commandsDir;
-        new CommandHandler_1.default(this, client, this._commandsDir);
+        this._commandHandler = new CommandHandler_1.default(this, client, this._commandsDir);
     }
     Object.defineProperty(ReliableHandler.prototype, "prefixes", {
         get: function () {
@@ -46,6 +47,20 @@ var ReliableHandler = /** @class */ (function () {
     ReliableHandler.prototype.getPrefix = function (guild) {
         return this._prefixes[guild ? guild.id : ''] || this._defaultPrefix;
     };
+    Object.defineProperty(ReliableHandler.prototype, "commands", {
+        get: function () {
+            return this._commandHandler.commands;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ReliableHandler.prototype, "commandAmount", {
+        get: function () {
+            return this.commands.length;
+        },
+        enumerable: false,
+        configurable: true
+    });
     return ReliableHandler;
 }());
 module.exports = ReliableHandler;
