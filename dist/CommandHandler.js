@@ -1,4 +1,31 @@
 "use strict";
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,6 +34,7 @@ var Command_1 = __importDefault(require("./Command"));
 var get_all_files_1 = __importDefault(require("./get-all-files"));
 var CommandHandler = /** @class */ (function () {
     function CommandHandler(instance, client, dir) {
+        var e_1, _a;
         var _this = this;
         this._commands = new Map();
         if (dir) {
@@ -16,42 +44,68 @@ var CommandHandler = /** @class */ (function () {
                 var amount = files.length;
                 if (amount > 0) {
                     console.log("[CommandHandler] Found " + amount + " command(s)");
-                    for (var _i = 0, files_1 = files; _i < files_1.length; _i++) {
-                        var file = files_1[_i];
-                        var fileName = file
-                            .replace(/\\/g, '/')
-                            .split('/');
-                        fileName = fileName[fileName.length - 1];
-                        fileName = fileName.split('.')[0].toLowerCase();
-                        var configuration = require(file);
-                        var name_1 = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, desription = configuration.desription, minArgs = configuration.minArgs, maxArgs = configuration.maxArgs;
-                        if (callback && execute) {
-                            throw new Error("[CommandHandler] Both callback and execute cannot be defined in " + file);
+                    try {
+                        // for(const file of files){
+                        //     let fileName: string | string[] = file
+                        //         .replace(/\\/g , '/')
+                        //         .split('/')
+                        //     fileName = fileName[fileName.length - 1]
+                        //     fileName = fileName.split('.')[0].toLowerCase()
+                        //     const configuration = require(file)
+                        //     const {
+                        //         name ,
+                        //         commands ,
+                        //         aliases ,
+                        //         callback ,
+                        //         execute ,
+                        //         desription ,
+                        //         minArgs ,
+                        //         maxArgs ,
+                        //     } = configuration
+                        //     if(callback && execute){
+                        //         throw new Error(`[CommandHandler] Both callback and execute cannot be defined in ${file}`)
+                        //     }
+                        //     let names = commands || aliases
+                        //     if(!name && (!names || names.length === 0)){
+                        //         throw new Error(`[CommandHandler] Name and names are required in ${file}`)
+                        //     }
+                        //     if(typeof names === 'string'){
+                        //         names = [names]
+                        //     }
+                        //     if(name && !names.includes(name.toLowerCase())){
+                        //         names.unshift(name.toLowerCase)
+                        //     }
+                        //     if(!names.includes(fileName)){
+                        //         names.unshift(fileName)
+                        //     }
+                        //     if(!desription){
+                        //         console.warn(`[CommandHandler] No description defined in ${file}`)
+                        //     }
+                        //     const hasCallback = callback || execute
+                        //     if(hasCallback){
+                        //         const command = new Command(
+                        //             instance ,
+                        //             client ,
+                        //             names ,
+                        //             callback || execute ,
+                        //             configuration
+                        //         )
+                        //         for(const name of names){
+                        //             this._commands.set(name.toLowerCase() , command)
+                        //         }
+                        //     }
+                        // }
+                        for (var files_1 = __values(files), files_1_1 = files_1.next(); !files_1_1.done; files_1_1 = files_1.next()) {
+                            var _b = __read(files_1_1.value, 2), file = _b[0], fileName = _b[1];
+                            this.registerCommand(instance, client, file, fileName);
                         }
-                        var names = commands || aliases;
-                        if (!name_1 && (!names || names.length === 0)) {
-                            throw new Error("[CommandHandler] Name and names are required in " + file);
+                    }
+                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                    finally {
+                        try {
+                            if (files_1_1 && !files_1_1.done && (_a = files_1.return)) _a.call(files_1);
                         }
-                        if (typeof names === 'string') {
-                            names = [names];
-                        }
-                        if (name_1 && !names.includes(name_1.toLowerCase())) {
-                            names.unshift(name_1.toLowerCase);
-                        }
-                        if (!names.includes(fileName)) {
-                            names.unshift(fileName);
-                        }
-                        if (!desription) {
-                            console.warn("[CommandHandler] No description defined in " + file);
-                        }
-                        var hasCallback = callback || execute;
-                        if (hasCallback) {
-                            var command = new Command_1.default(instance, client, names, callback || execute, configuration);
-                            for (var _a = 0, names_1 = names; _a < names_1.length; _a++) {
-                                var name_2 = names_1[_a];
-                                this._commands.set(name_2.toLowerCase(), command);
-                            }
-                        }
+                        finally { if (e_1) throw e_1.error; }
                     }
                     client.on('message', function (message) {
                         var guild = message.guild;
@@ -62,16 +116,27 @@ var CommandHandler = /** @class */ (function () {
                             var args = content.split(/ /g);
                             var firstElement = args.shift();
                             if (firstElement) {
-                                var name_3 = firstElement.toLowerCase();
-                                var command = _this._commands.get(name_3);
+                                var name_1 = firstElement.toLowerCase();
+                                var command = _this._commands.get(name_1);
                                 if (command) {
-                                    var minArgs = command.minArgs, maxArgs = command.maxArgs;
-                                    if (minArgs !== undefined && args.length < minArgs) {
-                                        message.reply("You need to provide at least " + minArgs + " argument(s)");
-                                        return;
-                                    }
-                                    if (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs) {
-                                        message.reply("You can provide at most " + maxArgs + " argument(s)");
+                                    // const { minArgs , maxArgs } = command
+                                    // if(minArgs !== undefined && args.length < minArgs){
+                                    //     message.reply(`You need to provide at least ${minArgs} argument(s)`)
+                                    //     return
+                                    // }
+                                    var minArgs = command.minArgs, maxArgs = command.maxArgs, expectedArgs = command.expectedArgs;
+                                    var _a = command.syntaxError, syntaxError = _a === void 0 ? instance.syntaxError : _a;
+                                    // if(maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs){
+                                    //     message.reply(`You can provide at most ${maxArgs} argument(s)`)
+                                    //     return
+                                    // }
+                                    if ((minArgs !== undefined && args.length < minArgs) ||
+                                        (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs)) {
+                                        if (syntaxError) {
+                                            syntaxError = syntaxError.replace(/{COMMAND}/g, prefix);
+                                        }
+                                        syntaxError = syntaxError.replace(/ {ARGUMENTS}/g, expectedArgs ? " " + expectedArgs : '');
+                                        message.reply(syntaxError);
                                         return;
                                     }
                                     command.execute(message, args);
@@ -86,6 +151,44 @@ var CommandHandler = /** @class */ (function () {
             }
         }
     }
+    CommandHandler.prototype.registerCommand = function (instance, client, file, fileName) {
+        var e_2, _a;
+        var configuration = require(file);
+        var _b = configuration.name, name = _b === void 0 ? fileName : _b, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, desription = configuration.desription;
+        if (callback && execute) {
+            throw new Error("[CommandHandler] Both callback and execute cannot be defined in " + file);
+        }
+        var names = commands || aliases || [];
+        if (!names && (!names || names.length === 0)) {
+            throw new Error("[CommandHandler] Name and names are required in " + file);
+        }
+        if (typeof names === 'string') {
+            names = [names];
+        }
+        if (name && !names.includes(name.toLowerCase())) {
+            names.unshift(name.toLowerCase);
+        }
+        if (!desription) {
+            console.warn("[CommandHandler] No description defined in " + file);
+        }
+        var hasCallback = callback || execute;
+        if (hasCallback) {
+            var command = new Command_1.default(instance, client, names, callback || execute, configuration);
+            try {
+                for (var names_1 = __values(names), names_1_1 = names_1.next(); !names_1_1.done; names_1_1 = names_1.next()) {
+                    var name_2 = names_1_1.value;
+                    this._commands.set(name_2.toLowerCase(), command);
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (names_1_1 && !names_1_1.done && (_a = names_1.return)) _a.call(names_1);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+        }
+    };
     Object.defineProperty(CommandHandler.prototype, "commands", {
         get: function () {
             var results = new Map();

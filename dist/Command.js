@@ -1,7 +1,15 @@
 "use strict";
+// interface configuration{
+//     names: string[] | string
+//     minArgs?: number
+//     maxArgs?: number
+//     expectedArgs: string
+//     description?: string
+//     callback: Function
+// }
 var Command = /** @class */ (function () {
     function Command(instance, client, names, callback, _a) {
-        var minArgs = _a.minArgs, maxArgs = _a.maxArgs, expectedArgs = _a.expectedArgs, description = _a.description;
+        var minArgs = _a.minArgs, maxArgs = _a.maxArgs, syntaxError = _a.syntaxError, description = _a.description;
         this._names = [];
         this._minArgs = 0;
         this._maxArgs = -1;
@@ -12,7 +20,7 @@ var Command = /** @class */ (function () {
         this._names = typeof names === 'string' ? [names] : names;
         this._minArgs = minArgs || 0;
         this._maxArgs = maxArgs === undefined ? -1 : maxArgs;
-        this._expectedArgs = expectedArgs;
+        this._syntaxError = syntaxError;
         this._description = description;
         this._callback = callback;
         if (this._minArgs < 0) {
@@ -26,9 +34,7 @@ var Command = /** @class */ (function () {
         }
     }
     Command.prototype.execute = function (message, args) {
-        this._callback(message, args, args.join(' '), this.client, message.guild
-            ? this.instance.prefixes[message.guild.id]
-            : this.instance.defaultPrefix);
+        this._callback(message, args, args.join(' '), this.client, this.instance.getPrefix(message.guild), this.instance);
     };
     Object.defineProperty(Command.prototype, "names", {
         get: function () {
@@ -54,6 +60,13 @@ var Command = /** @class */ (function () {
     Object.defineProperty(Command.prototype, "expectedArgs", {
         get: function () {
             return this._expectedArgs;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Command.prototype, "syntaxError", {
+        get: function () {
+            return this._syntaxError;
         },
         enumerable: false,
         configurable: true

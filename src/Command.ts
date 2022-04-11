@@ -1,14 +1,15 @@
 import { Client , GuildMember , Message } from 'discord.js'
 import ReliableHandler from "."
+import ICommandConfig from './interfaces/ICommandConfig'
 
-interface configuration{
-    names: string[] | string
-    minArgs?: number
-    maxArgs?: number
-    expectedArgs: string
-    description?: string
-    callback: Function
-}
+// interface configuration{
+//     names: string[] | string
+//     minArgs?: number
+//     maxArgs?: number
+//     expectedArgs: string
+//     description?: string
+//     callback: Function
+// }
 
 class Command {
     private instance: ReliableHandler
@@ -16,6 +17,7 @@ class Command {
     private _names: string[] = []
     private _minArgs: number = 0
     private _maxArgs: number = -1
+    private _syntaxError?: string
     private _expectedArgs?: string
     private _description?: string
     private _cooldown: string[] = []
@@ -26,14 +28,14 @@ class Command {
         client: Client ,
         names: string ,
         callback: Function ,
-        { minArgs , maxArgs , expectedArgs , description }: configuration
+        { minArgs , maxArgs , syntaxError , description }: ICommandConfig
     ){
         this.instance = instance
         this.client = client
         this._names = typeof names === 'string' ? [names] : names
         this._minArgs = minArgs || 0
         this._maxArgs = maxArgs === undefined ? -1 : maxArgs
-        this._expectedArgs = expectedArgs
+        this._syntaxError = syntaxError
         this._description = description
         this._callback = callback
 
@@ -56,9 +58,8 @@ class Command {
             args ,
             args.join(' ') ,
             this.client ,
-            message.guild
-                ? this.instance.prefixes[message.guild.id]
-                : this.instance.defaultPrefix
+            this.instance.getPrefix(message.guild) ,
+            this.instance
         )
     }
 
@@ -76,6 +77,10 @@ class Command {
 
     public get expectedArgs(): string | undefined {
         return this._expectedArgs
+    }
+
+    public get syntaxError(): string | undefined {
+        return this._syntaxError
     }
 
     public get description(): string | undefined {
