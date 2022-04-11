@@ -65,5 +65,3 @@ module.exports = {
     }
 }
 ```
-
-Running `>ping` or `>p` will execute this command and reply with "Pong!"
