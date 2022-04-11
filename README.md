@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-# reliablehandler.js
- 
-=======
 [![NPM](https://nodei.co/npm/reliablehandler.png)](https://nodei.co/npm/reliablehandler/)
 
 # TABLE OF CONTENTS
@@ -71,4 +67,3 @@ module.exports = {
 ```
 
 Running `>ping` or `>p` will execute this command and reply with "Pong!"
->>>>>>> Stashed changes
