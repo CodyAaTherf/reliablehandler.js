@@ -1,8 +1,7 @@
-// 5TH COMMANDSSSSSSEERDDD
-
 import { Client , Guild } from 'discord.js'
 import CommandHandler from './CommandHandler'
 import ICommand from './interfaces/ICommand'
+import mongo from './mongo'
 
 class ReliableHandler {
     private _defaultPrefix = '>'
@@ -30,6 +29,23 @@ class ReliableHandler {
 
         this._commandsDir = commandsDir || this._commandsDir
         this._commandHandler = new CommandHandler(this , client , this._commandsDir)
+
+        setTimeout(() => {
+            if(this._mongo){
+                mongo(this._mongo)
+            } else {
+                console.warn('[ReliableHandler] No mongo path provided')
+            }
+        } , 500)
+    }
+
+    public get mongoPath(): string{
+        return this._mongo
+    }
+
+    public setMongoPath(mongoPath: string): ReliableHandler {
+        this._mongo = mongoPath
+        return this
     }
 
     public get prefixes(){

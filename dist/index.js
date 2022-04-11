@@ -1,11 +1,12 @@
 "use strict";
-// 5TH COMMANDSSSSSSEERDDD
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 var CommandHandler_1 = __importDefault(require("./CommandHandler"));
+var mongo_1 = __importDefault(require("./mongo"));
 var ReliableHandler = /** @class */ (function () {
     function ReliableHandler(client, commandsDir, listenerDir) {
+        var _this = this;
         this._defaultPrefix = '>';
         this._commandsDir = 'commands';
         this._listenersDir = '';
@@ -25,7 +26,26 @@ var ReliableHandler = /** @class */ (function () {
         }
         this._commandsDir = commandsDir || this._commandsDir;
         this._commandHandler = new CommandHandler_1.default(this, client, this._commandsDir);
+        setTimeout(function () {
+            if (_this._mongo) {
+                (0, mongo_1.default)(_this._mongo);
+            }
+            else {
+                console.warn('[ReliableHandler] No mongo path provided');
+            }
+        }, 500);
     }
+    Object.defineProperty(ReliableHandler.prototype, "mongoPath", {
+        get: function () {
+            return this._mongo;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ReliableHandler.prototype.setMongoPath = function (mongoPath) {
+        this._mongo = mongoPath;
+        return this;
+    };
     Object.defineProperty(ReliableHandler.prototype, "prefixes", {
         get: function () {
             return this._prefixes;

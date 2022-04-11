@@ -36,7 +36,9 @@ class CommandHandler {
                             aliases ,
                             callback ,
                             execute ,
-                            desription
+                            desription ,
+                            minArgs ,
+                            maxArgs ,
                         } = configuration
 
                         if(callback && execute){
@@ -90,15 +92,27 @@ class CommandHandler {
 
                         if (content.startsWith(prefix)){
                             content = content.substring(prefix.length) // Remove prefix
-                            const words = content.split(/ /g)
-                            const firstElement = words.shift()
+                            const args = content.split(/ /g)
+                            const firstElement = args.shift()
 
                             if(firstElement){
-                                const alias = firstElement.toLowerCase()
+                                const name = firstElement.toLowerCase()
 
-                                const command = this._commands.get(alias)
+                                const command = this._commands.get(name)
                                 if(command){
-                                    command.execute(message , words)
+                                    const { minArgs , maxArgs } = command
+
+                                    if(minArgs !== undefined && args.length < minArgs){
+                                        message.reply(`You need to provide at least ${minArgs} argument(s)`)
+                                        return
+                                    }
+
+                                    if(maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs){
+                                        message.reply(`You can provide at most ${maxArgs} argument(s)`)
+                                        return
+                                    }
+
+                                    command.execute(message , args)
                                 }
                             }
                         }

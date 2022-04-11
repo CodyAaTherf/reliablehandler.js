@@ -24,7 +24,7 @@ var CommandHandler = /** @class */ (function () {
                         fileName = fileName[fileName.length - 1];
                         fileName = fileName.split('.')[0].toLowerCase();
                         var configuration = require(file);
-                        var name_1 = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, desription = configuration.desription;
+                        var name_1 = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, desription = configuration.desription, minArgs = configuration.minArgs, maxArgs = configuration.maxArgs;
                         if (callback && execute) {
                             throw new Error("[CommandHandler] Both callback and execute cannot be defined in " + file);
                         }
@@ -59,13 +59,22 @@ var CommandHandler = /** @class */ (function () {
                         var prefix = instance.getPrefix(guild);
                         if (content.startsWith(prefix)) {
                             content = content.substring(prefix.length); // Remove prefix
-                            var words = content.split(/ /g);
-                            var firstElement = words.shift();
+                            var args = content.split(/ /g);
+                            var firstElement = args.shift();
                             if (firstElement) {
-                                var alias = firstElement.toLowerCase();
-                                var command = _this._commands.get(alias);
+                                var name_3 = firstElement.toLowerCase();
+                                var command = _this._commands.get(name_3);
                                 if (command) {
-                                    command.execute(message, words);
+                                    var minArgs = command.minArgs, maxArgs = command.maxArgs;
+                                    if (minArgs !== undefined && args.length < minArgs) {
+                                        message.reply("You need to provide at least " + minArgs + " argument(s)");
+                                        return;
+                                    }
+                                    if (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs) {
+                                        message.reply("You can provide at most " + maxArgs + " argument(s)");
+                                        return;
+                                    }
+                                    command.execute(message, args);
                                 }
                             }
                         }

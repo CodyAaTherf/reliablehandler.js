@@ -1,0 +1,10 @@
+OVER TILL NUMBER 5
+ADD README NOW
+TEST IT FIRST LOL
+
+DAY 2 KA 5
+
+
+BUGS
+> Running `>ping` or `>p` will execute this command and reply with "Pong!"
+NOPE IT DOESN'T HAVE TO FX IT FASTTTTTT

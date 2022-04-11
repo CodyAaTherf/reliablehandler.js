@@ -31,9 +31,11 @@
   },
   "homepage": "https://github.com/CodyAaTherf/reliablehandler.js#readme",
   "dependencies": {
-    "discord.js": "^13.6.0"
+    "discord.js": "^13.6.0",
+    "mongoose": "^6.2.10"
   },
   "devDependencies": {
+    "@types/mongoose": "^5.11.97",
     "@types/node": "^17.0.23"
   }
 }
