@@ -78,6 +78,7 @@ var fs_1 = __importDefault(require("fs"));
 var Command_1 = __importDefault(require("./Command"));
 var get_all_files_1 = __importDefault(require("./get-all-files"));
 var disabled_commands_1 = __importDefault(require("./modles/disabled-commands"));
+var permissions_1 = __importDefault(require("./permissions"));
 var CommandHandler = /** @class */ (function () {
     function CommandHandler(instance, client, dir) {
         var e_1, _a;
@@ -106,6 +107,7 @@ var CommandHandler = /** @class */ (function () {
                         finally { if (e_1) throw e_1.error; }
                     }
                     client.on('message', function (message) {
+                        var e_2, _a;
                         var guild = message.guild;
                         var content = message.content;
                         var prefix = instance.getPrefix(guild);
@@ -124,8 +126,26 @@ var CommandHandler = /** @class */ (function () {
                                             return;
                                         }
                                     }
-                                    var minArgs = command.minArgs, maxArgs = command.maxArgs, expectedArgs = command.expectedArgs;
-                                    var _a = command.syntaxError, syntaxError = _a === void 0 ? instance.syntaxError : _a;
+                                    var member = message.member;
+                                    var minArgs = command.minArgs, maxArgs = command.maxArgs, expectedArgs = command.expectedArgs, _b = command.requiredPermissions, requiredPermissions = _b === void 0 ? [] : _b;
+                                    var _c = command.syntaxError, syntaxError = _c === void 0 ? instance.syntaxError : _c;
+                                    try {
+                                        for (var requiredPermissions_1 = __values(requiredPermissions), requiredPermissions_1_1 = requiredPermissions_1.next(); !requiredPermissions_1_1.done; requiredPermissions_1_1 = requiredPermissions_1.next()) {
+                                            var perm = requiredPermissions_1_1.value;
+                                            // @ts-ignore
+                                            if (!(member === null || member === void 0 ? void 0 : member.hasPermission(perm))) {
+                                                message.reply("You do not have permission to use this command");
+                                                return;
+                                            }
+                                        }
+                                    }
+                                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                                    finally {
+                                        try {
+                                            if (requiredPermissions_1_1 && !requiredPermissions_1_1.done && (_a = requiredPermissions_1.return)) _a.call(requiredPermissions_1);
+                                        }
+                                        finally { if (e_2) throw e_2.error; }
+                                    }
                                     if ((minArgs !== undefined && args.length < minArgs) ||
                                         (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs)) {
                                         if (syntaxError) {
@@ -148,9 +168,9 @@ var CommandHandler = /** @class */ (function () {
         }
     }
     CommandHandler.prototype.registerCommand = function (instance, client, file, fileName) {
-        var e_2, _a;
+        var e_3, _a, e_4, _b;
         var configuration = require(file);
-        var _b = configuration.name, name = _b === void 0 ? fileName : _b, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, run = configuration.run, desription = configuration.desription;
+        var _c = configuration.name, name = _c === void 0 ? fileName : _c, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, run = configuration.run, desription = configuration.desription, requiredPermissions = configuration.requiredPermissions;
         var callbackCounter = 0;
         if (callback)
             ++callbackCounter;
@@ -171,6 +191,23 @@ var CommandHandler = /** @class */ (function () {
         if (name && !names.includes(name.toLowerCase())) {
             names.unshift(name.toLowerCase);
         }
+        if (requiredPermissions) {
+            try {
+                for (var requiredPermissions_2 = __values(requiredPermissions), requiredPermissions_2_1 = requiredPermissions_2.next(); !requiredPermissions_2_1.done; requiredPermissions_2_1 = requiredPermissions_2.next()) {
+                    var perm = requiredPermissions_2_1.value;
+                    if (!permissions_1.default.includes(perm)) {
+                        throw new Error("[CommandHandler] Invalid permission " + perm + " in " + file + ". Permissions must be one of the following - " + __spreadArray([], __read(permissions_1.default), false).join('" , "'));
+                    }
+                }
+            }
+            catch (e_3_1) { e_3 = { error: e_3_1 }; }
+            finally {
+                try {
+                    if (requiredPermissions_2_1 && !requiredPermissions_2_1.done && (_a = requiredPermissions_2.return)) _a.call(requiredPermissions_2);
+                }
+                finally { if (e_3) throw e_3.error; }
+            }
+        }
         if (!desription) {
             console.warn("[CommandHandler] No description defined in " + file);
         }
@@ -183,12 +220,12 @@ var CommandHandler = /** @class */ (function () {
                     this._commands.set(name_2.toLowerCase(), command);
                 }
             }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
             finally {
                 try {
-                    if (names_1_1 && !names_1_1.done && (_a = names_1.return)) _a.call(names_1);
+                    if (names_1_1 && !names_1_1.done && (_b = names_1.return)) _b.call(names_1);
                 }
-                finally { if (e_2) throw e_2.error; }
+                finally { if (e_4) throw e_4.error; }
             }
         }
     };
@@ -210,7 +247,7 @@ var CommandHandler = /** @class */ (function () {
     CommandHandler.prototype.fetchDisabledCommands = function () {
         return __awaiter(this, void 0, void 0, function () {
             var results, results_1, results_1_1, result, guildId, command, array;
-            var e_3, _a;
+            var e_5, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, disabled_commands_1.default.find({})];
@@ -225,12 +262,12 @@ var CommandHandler = /** @class */ (function () {
                                 this._disabled.set(guildId, array);
                             }
                         }
-                        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                        catch (e_5_1) { e_5 = { error: e_5_1 }; }
                         finally {
                             try {
                                 if (results_1_1 && !results_1_1.done && (_a = results_1.return)) _a.call(results_1);
                             }
-                            finally { if (e_3) throw e_3.error; }
+                            finally { if (e_5) throw e_5.error; }
                         }
                         console.log("[CommandHandler] Fetched " + results.length + " disabled commands");
                         return [2 /*return*/];

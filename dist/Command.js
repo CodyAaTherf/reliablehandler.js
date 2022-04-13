@@ -1,11 +1,11 @@
 "use strict";
 var Command = /** @class */ (function () {
     function Command(instance, client, names, callback, _a) {
-        var minArgs = _a.minArgs, maxArgs = _a.maxArgs, syntaxError = _a.syntaxError, description = _a.description;
+        var minArgs = _a.minArgs, maxArgs = _a.maxArgs, syntaxError = _a.syntaxError, description = _a.description, requiredPermissions = _a.requiredPermissions;
         this._names = [];
         this._minArgs = 0;
         this._maxArgs = -1;
-        this._cooldown = [];
+        this._requiredPermissions = [];
         this._callback = function () { };
         this.instance = instance;
         this.client = client;
@@ -14,6 +14,7 @@ var Command = /** @class */ (function () {
         this._maxArgs = maxArgs === undefined ? -1 : maxArgs;
         this._syntaxError = syntaxError;
         this._description = description;
+        this._requiredPermissions = requiredPermissions;
         this._callback = callback;
         if (this._minArgs < 0) {
             throw new Error("[Command] minArgs cannot be less than 0");
@@ -70,18 +71,13 @@ var Command = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Command.prototype.setCooldown = function (member, seconds) {
-        if (typeof member !== 'string') {
-            member = member.id;
-        }
-        console.log("[Command] Setting cooldown for " + member + " for " + seconds + " seconds");
-    };
-    Command.prototype.clearCooldown = function (member, seconds) {
-        if (typeof member !== 'string') {
-            member = member.id;
-        }
-        console.log("[Command] Clearing cooldown for " + member + " for " + seconds + " seconds");
-    };
+    Object.defineProperty(Command.prototype, "requiredPermissions", {
+        get: function () {
+            return this._requiredPermissions;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(Command.prototype, "callback", {
         get: function () {
             return this._callback;

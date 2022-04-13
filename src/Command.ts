@@ -1,4 +1,4 @@
-import { Client , GuildMember , Message } from 'discord.js'
+import { Client , Message } from 'discord.js'
 import ReliableHandler from "."
 import ICommandConfig from './interfaces/ICommandConfig'
 
@@ -11,7 +11,7 @@ class Command {
     private _syntaxError?: string
     private _expectedArgs?: string
     private _description?: string
-    private _cooldown: string[] = []
+    private _requiredPermissions?: string[] = []
     private _callback: Function = () => {}
 
     constructor(
@@ -19,7 +19,7 @@ class Command {
         client: Client ,
         names: string ,
         callback: Function ,
-        { minArgs , maxArgs , syntaxError , description }: ICommandConfig
+        { minArgs , maxArgs , syntaxError , description , requiredPermissions }: ICommandConfig
     ){
         this.instance = instance
         this.client = client
@@ -28,6 +28,7 @@ class Command {
         this._maxArgs = maxArgs === undefined ? -1 : maxArgs
         this._syntaxError = syntaxError
         this._description = description
+        this._requiredPermissions = requiredPermissions
         this._callback = callback
 
         if(this._minArgs < 0){
@@ -78,20 +79,8 @@ class Command {
         return this._description
     }
 
-    public setCooldown(member: GuildMember | string , seconds: number){
-        if(typeof member !== 'string'){
-            member = member.id
-        }
-
-        console.log(`[Command] Setting cooldown for ${member} for ${seconds} seconds`);
-    }
-
-    public clearCooldown(member: GuildMember | string , seconds: number){
-        if(typeof member !== 'string'){
-            member = member.id
-        }
-
-        console.log(`[Command] Clearing cooldown for ${member} for ${seconds} seconds`);         
+    public get requiredPermissions(): string[] | undefined {
+        return this._requiredPermissions
     }
 
     public get callback(): Function {

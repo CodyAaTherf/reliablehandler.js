@@ -1,5 +1,4 @@
 import { Client , Guild } from 'discord.js'
-import { Document } from 'mongoose'
 import path from 'path'
 
 import CommandHandler from './CommandHandler'
