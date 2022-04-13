@@ -2,11 +2,11 @@
   "name": "reliablehandler",
   "version": "1.0.0",
   "description": "some random discord.js cmd handler ok bye",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1" ,
-    "tsc": "tsc -w --outDir dist --rootDir src --skipLibCheck" ,
-    "compile": "tsc && node dist/index.js" ,
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc -w --outDir dist --rootDir src --skipLibCheck",
+    "compile": "tsc && node dist/index.js",
     "dev": "nodemon -e ts --exec \"npm run compile\""
   },
   "repository": {
@@ -31,6 +31,11 @@
   },
   "homepage": "https://github.com/CodyAaTherf/reliablehandler.js#readme",
   "dependencies": {
-    "discord.js": "^13.6.0"
+    "discord.js": "^13.6.0",
+    "mongoose": "^6.2.10"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^17.0.23"
   }
 }
