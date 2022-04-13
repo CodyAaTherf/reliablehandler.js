@@ -192,6 +192,13 @@ var ReliableHandler = /** @class */ (function () {
             this._prefixes[guild.id] = prefix;
         }
     };
+    Object.defineProperty(ReliableHandler.prototype, "commandHandler", {
+        get: function () {
+            return this._commandHandler;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(ReliableHandler.prototype, "commands", {
         get: function () {
             return this._commandHandler.commands;

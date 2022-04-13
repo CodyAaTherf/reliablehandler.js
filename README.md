@@ -65,3 +65,8 @@ module.exports = {
     }
 }
 ```
+
+## Min and Max Arugment Rules
+
+You can speficy how many arguments are required and also provide an error message for every command.
+
