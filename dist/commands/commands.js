@@ -12,6 +12,7 @@ var __values = (this && this.__values) || function(o) {
 };
 module.exports = {
     maxArgs: 0,
+    description: 'Displays all commands',
     callback: function (message, args, text, prefix, client, instance) {
         var e_1, _a;
         var msg = "Commands: \n";
@@ -19,7 +20,12 @@ module.exports = {
             for (var _b = __values(instance.commands), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var command = _c.value;
                 var names = command.names, description = command.description;
-                msg += "\n            **" + names.shift() + "**\n            Aliases: " + (names.length ? "\"" + names.join('" , "') + "\"" : 'None') + "\n            Description: " + (description || 'None') + "\n            ";
+                var mainCommand = names.shift() || '';
+                msg += "\n                **" + mainCommand + "**\n                Aliases: " + (names.length ? "\"" + names.join('" , "') + "\"" : 'None') + "\n                Description: " + (description || 'None') + "\n                Enabled: " + (message.guild
+                    ? instance.commandHandler.isCommandDisabled(message.guild.id, mainCommand)
+                        ? 'No'
+                        : 'Yes'
+                    : '') + "\n            ";
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }

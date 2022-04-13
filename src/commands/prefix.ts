@@ -7,6 +7,7 @@ export = {
     minArgs: 0 ,
     maxArgs: 1 ,
     expectedArgss: '<prefix>' ,
+    description: 'Changes the prefix for this server' ,
     callback: async(
         message: Message ,
         args: string[] ,

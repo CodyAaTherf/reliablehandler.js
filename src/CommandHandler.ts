@@ -98,10 +98,16 @@ class CommandHandler {
             aliases ,
             callback ,
             execute ,
+            run ,
             desription ,
         } = configuration
 
-        if(callback && execute){
+        let callbackCounter = 0
+        if(callback) ++callbackCounter
+        if(execute) ++callbackCounter
+        if(run) ++callbackCounter
+
+        if(callbackCounter > 1){
             throw new Error(`[CommandHandler] Both callback and execute cannot be defined in ${file}`)
         }
 
@@ -123,7 +129,7 @@ class CommandHandler {
             console.warn(`[CommandHandler] No description defined in ${file}`)
         }
 
-        const hasCallback = callback || execute
+        const hasCallback = callback || execute || run
 
         if(hasCallback){
             const command = new Command(

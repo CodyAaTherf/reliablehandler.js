@@ -150,8 +150,15 @@ var CommandHandler = /** @class */ (function () {
     CommandHandler.prototype.registerCommand = function (instance, client, file, fileName) {
         var e_2, _a;
         var configuration = require(file);
-        var _b = configuration.name, name = _b === void 0 ? fileName : _b, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, desription = configuration.desription;
-        if (callback && execute) {
+        var _b = configuration.name, name = _b === void 0 ? fileName : _b, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, run = configuration.run, desription = configuration.desription;
+        var callbackCounter = 0;
+        if (callback)
+            ++callbackCounter;
+        if (execute)
+            ++callbackCounter;
+        if (run)
+            ++callbackCounter;
+        if (callbackCounter > 1) {
             throw new Error("[CommandHandler] Both callback and execute cannot be defined in " + file);
         }
         var names = commands || aliases || [];
@@ -167,7 +174,7 @@ var CommandHandler = /** @class */ (function () {
         if (!desription) {
             console.warn("[CommandHandler] No description defined in " + file);
         }
-        var hasCallback = callback || execute;
+        var hasCallback = callback || execute || run;
         if (hasCallback) {
             var command = new Command_1.default(instance, client, names, callback || execute, configuration);
             try {

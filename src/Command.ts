@@ -2,15 +2,6 @@ import { Client , GuildMember , Message } from 'discord.js'
 import ReliableHandler from "."
 import ICommandConfig from './interfaces/ICommandConfig'
 
-// interface configuration{
-//     names: string[] | string
-//     minArgs?: number
-//     maxArgs?: number
-//     expectedArgs: string
-//     description?: string
-//     callback: Function
-// }
-
 class Command {
     private instance: ReliableHandler
     private client: Client

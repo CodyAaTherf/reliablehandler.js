@@ -3,6 +3,7 @@ import ReliableHandler from '..'
 
 export = {
     maxArgs: 0 ,
+    description: 'Displays all commands' ,
     callback: (
         message: Message ,
         args: string[] ,
@@ -15,11 +16,19 @@ export = {
 
         for(const command of instance.commands){
             const { names , description } = command
+            const mainCommand = names.shift() || ''
 
             msg += `
-            **${names.shift()}**
-            Aliases: ${names.length ? `"${names.join('" , "')}"` : 'None'}
-            Description: ${description || 'None'}
+                **${mainCommand}**
+                Aliases: ${names.length ? `"${names.join('" , "')}"` : 'None'}
+                Description: ${description || 'None'}
+                Enabled: ${
+                    message.guild
+                        ? instance.commandHandler.isCommandDisabled(message.guild.id , mainCommand)
+                            ? 'No'
+                            : 'Yes'
+                        : ''
+                }
             `
         }
 

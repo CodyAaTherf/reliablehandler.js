@@ -1,12 +1,4 @@
 "use strict";
-// interface configuration{
-//     names: string[] | string
-//     minArgs?: number
-//     maxArgs?: number
-//     expectedArgs: string
-//     description?: string
-//     callback: Function
-// }
 var Command = /** @class */ (function () {
     function Command(instance, client, names, callback, _a) {
         var minArgs = _a.minArgs, maxArgs = _a.maxArgs, syntaxError = _a.syntaxError, description = _a.description;

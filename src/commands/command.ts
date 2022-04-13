@@ -1,11 +1,12 @@
 import { Client , Message } from 'discord.js'
 import ReliableHandler from '..'
-import commandStatus from '../modles/disabled-commands'
+import disabledCommands from '../modles/disabled-commands'
 
 export = {
     minArgs: 2 ,
     maxArgs: 2 ,
     expectedArgs: '<"enable"|"disable"> <command>' ,
+    description: 'Enables or disables a command for this server' ,
     callback: async(
         message: Message ,
         args: string[] ,
@@ -41,7 +42,7 @@ export = {
                         return
                     }
 
-                    await commandStatus.deleteOne({
+                    await disabledCommands.deleteOne({
                         guildId: guild.id ,
                         command: mainCommand ,
                     })
@@ -55,7 +56,7 @@ export = {
                         return
                     }
 
-                    await new commandStatus({
+                    await new disabledCommands({
                         guildId: guild.id ,
                         command: mainCommand ,
                     }).save()
