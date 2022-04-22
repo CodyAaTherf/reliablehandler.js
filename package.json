@@ -1,6 +1,6 @@
 {
   "name": "reliablehandler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "some random discord.js cmd handler ok bye",
   "main": "dist/index.js",
   "scripts": {
