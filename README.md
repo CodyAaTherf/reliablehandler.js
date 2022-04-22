@@ -4,6 +4,9 @@
 
 - [Installation](#installation)
 - [Setup](#setup)
+- [Argument Rules](#arugment-rules)
+- [Syntax Errors](#syntax-errors)
+- [Required Permissions](#required-permssions)
 
 # Installation
 
@@ -66,7 +69,92 @@ module.exports = {
 }
 ```
 
-## Min and Max Arugment Rules
+# Arugment Rules
 
 You can speficy how many arguments are required and also provide an error message for every command.
 
+```JS
+// File name: "ping.js"
+// Folder "./cmds"
+
+module.exports = {
+    name: 'ping' , // Required
+    aliases: ['p'] , // Optional aliases
+    description: "A simple ping command" , // Optional description
+    minArgs: 0 ,
+    maxArgs: 0 ,
+    syntaxError: "Incorrect Syntax!"
+    callback: (message) => {
+        message.reply('Pong!')
+    }
+}
+```
+
+If you want no maximum aguments , you can do -
+
+```js
+maxArgs: -1 // -1 is no limit
+```
+
+# Syntax Errors
+
+Most of the times the Syntax Errors will be same. You can speficy a common syntax error for all the commands using -
+
+```js
+new ReliableHandler(client)
+    .setSyntaxError('Incorrect Syntax!`)
+```
+
+If you've speficied syntax error in the command , it will override the global syntax error.
+
+# Required Permssions
+
+For example: If you are using a ban command , you would want the person using the `BAN MEMBERS` permission. To speficy that you can do so -
+
+```js
+module.exports = {
+    maxArgs: 1 ,
+    requiredPermissions: ['BAN_MEMBERS'] ,
+    callback: () => {
+        // code
+    }
+}
+```
+
+All supported permissions - 
+
+```js
+export = [
+    'CREATE_INSTANT_INVITE' ,
+    'KICK_MEMBERS' ,
+    'BAN_MEMBERS' ,
+    'ADMINISTRATOR' ,
+    'MANAGE_CHANNELS' ,
+    'MANAGE_GUILD' ,
+    'ADD_REACTIONS' ,
+    'VIEW_AUDIT_LOG' ,
+    'PRIORITY_SPEAKER' ,
+    'STREAM' ,
+    'VIEW_CHANNEL' ,
+    'SEND_MESSAGES' ,
+    'SEND_TTS_MESSAGES' ,
+    'MANAGE_MESSAGES' ,
+    'EMBED_LINKS' ,
+    'ATTACH_FILES' ,
+    'READ_MESSAGE_HISTORY' ,
+    'MENTION_EVERYONE' ,
+    'USE_EXTERNAL_EMOJIS' ,
+    'VIEW_GUILD_INSIGHTS' ,
+    'CONNECT' ,
+    'SPEAK' ,
+    'MUTE_MEMBERS' ,
+    'DEAFEN_MEMBERS' ,
+    'MOVE_MEMBERS' ,
+    'USE_VAD' ,
+    'CHANGE_NICKNAME' ,
+    'MANAGE_NICKNAMES' ,
+    'MANAGE_ROLES' ,
+    'MANAGE_WEBHOOKS' ,
+    'MANAGE_EMOJIS' ,
+]
+```

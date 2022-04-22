@@ -1,11 +1,12 @@
 import { Client , Message } from 'discord.js'
 import ReliableHandler from '..'
-import disabledCommands from '../modles/disabled-commands'
+import disabledCommands from '../models/disabled-commands'
 
 export = {
     minArgs: 2 ,
     maxArgs: 2 ,
     expectedArgs: '<"enable"|"disable"> <command>' ,
+    requiredPermissions: ['ADMINISTRATOR'] ,
     description: 'Enables or disables a command for this server' ,
     callback: async(
         message: Message ,
@@ -15,8 +16,9 @@ export = {
         prefix: string ,
         instance: ReliableHandler
     ) => {
+        
         const newState = args.shift()?.toLowerCase()
-        const name = args.shift()?.toLowerCase()
+        const name = (args.shift() || '').toLowerCase()
 
         if(newState !== 'enable' && newState !== 'disable'){
             message.reply('Please provide a valid state')
@@ -30,45 +32,88 @@ export = {
             return
         }
 
-        for(const { names } of instance.commands){
-            // @ts-ignore
-            if(names.includes(name)){
-                const mainCommand = names[0]
-                const isDisabled = instance.commandHandler.isCommandDisabled(guild.id , mainCommand)
+        // for(const { names } of instance.commandHandler.commands){
+        //     // @ts-ignore
+        //     if(names.includes(name)){
+        //         const mainCommand = names[0]
+        //         const isDisabled = instance.commandHandler.isCommandDisabled(guild.id , mainCommand)
 
-                if(newState === 'enable'){
-                    if(!isDisabled){
-                        message.reply('This command is already enabled')
-                        return
-                    }
+        //         if(newState === 'enable'){
+        //             if(!isDisabled){
+        //                 message.reply('This command is already enabled')
+        //                 return
+        //             }
 
-                    await disabledCommands.deleteOne({
-                        guildId: guild.id ,
-                        command: mainCommand ,
-                    })
+        //             await disabledCommands.deleteOne({
+        //                 guildId: guild.id ,
+        //                 command: mainCommand ,
+        //             })
 
-                    instance.commandHandler.enableCommand(guild.id , mainCommand)
+        //             instance.commandHandler.enableCommand(guild.id , mainCommand)
 
-                    message.reply('Command enabled')
-                } else {
-                    if(isDisabled){
-                        message.reply('This command is already disabled')
-                        return
-                    }
+        //             message.reply('Command enabled')
+        //         } else {
+        //             if(isDisabled){
+        //                 message.reply('This command is already disabled')
+        //                 return
+        //             }
 
-                    await new disabledCommands({
-                        guildId: guild.id ,
-                        command: mainCommand ,
-                    }).save()
+        //             await new disabledCommands({
+        //                 guildId: guild.id ,
+        //                 command: mainCommand ,
+        //             }).save()
 
-                    instance.commandHandler.disableCommand(guild.id , mainCommand)
+        //             instance.commandHandler.disableCommand(guild.id , mainCommand)
 
-                    message.reply('Command disabled')
-                }
+        //             message.reply('Command disabled')
+        //         }
 
-                return
-            }
-        }
+        //         return
+        //     }
+        // }
+
+        // -------------------------------------------------
+
+        // const command = instance.commandHandler.getCommand(name)
+    
+        // // const command = this._commands.get(name)
+
+        // if(!command){
+        //     const mainCommand = command.names[0]
+        //     const isDisabled = command.isDisabled(guild.id)
+
+        //     if(newState === 'enable'){
+        //         if(!isDisabled){
+        //             message.reply('This command is already enabled')
+        //             return
+        //         }
+
+        //         await disabledCommands.deleteOne({
+        //             guildId: guild.id ,
+        //             command: mainCommand ,
+        //         })
+
+        //         command.enable(guild.id)
+
+        //         message.reply('Command enabled')
+        //     } else {
+        //         if(isDisabled){
+        //             message.reply('This command is already disabled')
+        //             return
+        //         }
+
+        //         await new disabledCommands({
+        //             guildId: guild.id ,
+        //             command: mainCommand ,
+        //         }).save()
+
+        //         command.disable(guild.id)
+
+        //         message.reply('Command disabled')
+        //     }
+        // } else{
+        //     message.reply('This command does not exist')
+        // }
 
         message.reply('Command not found')
     }

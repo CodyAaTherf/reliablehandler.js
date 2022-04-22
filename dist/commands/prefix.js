@@ -38,12 +38,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var prefixes_1 = __importDefault(require("../modles/prefixes"));
+var prefixes_1 = __importDefault(require("../models/prefixes"));
 module.exports = {
     name: 'prefix',
     minArgs: 0,
     maxArgs: 1,
     expectedArgss: '<prefix>',
+    requiredPermissions: ['ADMINISTRATOR'],
     description: 'Changes the prefix for this server',
     callback: function (message, args, text, client, prefix, instance) { return __awaiter(void 0, void 0, void 0, function () {
         var guild, id;

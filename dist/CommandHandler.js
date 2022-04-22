@@ -77,14 +77,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var fs_1 = __importDefault(require("fs"));
 var Command_1 = __importDefault(require("./Command"));
 var get_all_files_1 = __importDefault(require("./get-all-files"));
-var disabled_commands_1 = __importDefault(require("./modles/disabled-commands"));
+var disabled_commands_1 = __importDefault(require("./models/disabled-commands"));
+var required_roles_1 = __importDefault(require("./models/required-roles"));
 var permissions_1 = __importDefault(require("./permissions"));
 var CommandHandler = /** @class */ (function () {
+    // private _disabled: Map<String , String[]> = new Map()
     function CommandHandler(instance, client, dir) {
         var e_1, _a;
         var _this = this;
         this._commands = new Map();
-        this._disabled = new Map();
         if (dir) {
             if (fs_1.default.existsSync(dir)) {
                 var files = (0, get_all_files_1.default)(dir);
@@ -93,6 +94,7 @@ var CommandHandler = /** @class */ (function () {
                 if (amount > 0) {
                     console.log("[CommandHandler] Found " + amount + " command(s)");
                     this.fetchDisabledCommands();
+                    this.fetchRequiredRoles();
                     try {
                         for (var files_1 = __values(files), files_1_1 = files_1.next(); !files_1_1.done; files_1_1 = files_1.next()) {
                             var _b = __read(files_1_1.value, 2), file = _b[0], fileName = _b[1];
@@ -107,7 +109,7 @@ var CommandHandler = /** @class */ (function () {
                         finally { if (e_1) throw e_1.error; }
                     }
                     client.on('message', function (message) {
-                        var e_2, _a;
+                        var e_2, _a, e_3, _b;
                         var guild = message.guild;
                         var content = message.content;
                         var prefix = instance.getPrefix(guild);
@@ -120,31 +122,67 @@ var CommandHandler = /** @class */ (function () {
                                 var command = _this._commands.get(name_1);
                                 if (command) {
                                     if (guild) {
-                                        var isDisabled = instance.commandHandler.isCommandDisabled(guild.id, command.names[0]);
+                                        // const isDisabled = instance.commandHandler.isCommandDisabled(
+                                        //     guild.id ,
+                                        //     command.names[0]
+                                        // )
+                                        var isDisabled = command.isDisabled(guild.id);
                                         if (isDisabled) {
                                             message.reply("Command " + command.names[0] + " is disabled");
                                             return;
                                         }
                                     }
                                     var member = message.member;
-                                    var minArgs = command.minArgs, maxArgs = command.maxArgs, expectedArgs = command.expectedArgs, _b = command.requiredPermissions, requiredPermissions = _b === void 0 ? [] : _b;
-                                    var _c = command.syntaxError, syntaxError = _c === void 0 ? instance.syntaxError : _c;
-                                    try {
-                                        for (var requiredPermissions_1 = __values(requiredPermissions), requiredPermissions_1_1 = requiredPermissions_1.next(); !requiredPermissions_1_1.done; requiredPermissions_1_1 = requiredPermissions_1.next()) {
-                                            var perm = requiredPermissions_1_1.value;
-                                            // @ts-ignore
-                                            if (!(member === null || member === void 0 ? void 0 : member.hasPermission(perm))) {
-                                                message.reply("You do not have permission to use this command");
-                                                return;
+                                    var minArgs = command.minArgs, maxArgs = command.maxArgs, expectedArgs = command.expectedArgs, _c = command.requiredPermissions, requiredPermissions = _c === void 0 ? [] : _c;
+                                    var _d = command.syntaxError, syntaxError = _d === void 0 ? instance.syntaxError : _d;
+                                    // for(const perm of requiredPermissions){
+                                    //     // @ts-ignore
+                                    //     if(!member?.hasPermission(perm)){
+                                    //         message.reply(`You do not have permission to use this command`)
+                                    //         return
+                                    //     }
+                                    // }
+                                    if (guild && member) {
+                                        try {
+                                            for (var requiredPermissions_1 = __values(requiredPermissions), requiredPermissions_1_1 = requiredPermissions_1.next(); !requiredPermissions_1_1.done; requiredPermissions_1_1 = requiredPermissions_1.next()) {
+                                                var perm = requiredPermissions_1_1.value;
+                                                // @ts-ignore
+                                                if (!member.hasPermission(perm)) {
+                                                    message.reply("You do not have permission to use this command");
+                                                    return;
+                                                }
                                             }
                                         }
-                                    }
-                                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                                    finally {
-                                        try {
-                                            if (requiredPermissions_1_1 && !requiredPermissions_1_1.done && (_a = requiredPermissions_1.return)) _a.call(requiredPermissions_1);
+                                        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                                        finally {
+                                            try {
+                                                if (requiredPermissions_1_1 && !requiredPermissions_1_1.done && (_a = requiredPermissions_1.return)) _a.call(requiredPermissions_1);
+                                            }
+                                            finally { if (e_2) throw e_2.error; }
                                         }
-                                        finally { if (e_2) throw e_2.error; }
+                                        var roles = command.getRequiredRoles(guild.id);
+                                        if (roles && roles.length) {
+                                            var hasRole = false;
+                                            try {
+                                                for (var roles_1 = __values(roles), roles_1_1 = roles_1.next(); !roles_1_1.done; roles_1_1 = roles_1.next()) {
+                                                    var role = roles_1_1.value;
+                                                    if (member.roles.cache.has(role)) {
+                                                        hasRole = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                                            finally {
+                                                try {
+                                                    if (roles_1_1 && !roles_1_1.done && (_b = roles_1.return)) _b.call(roles_1);
+                                                }
+                                                finally { if (e_3) throw e_3.error; }
+                                            }
+                                            if (!hasRole) {
+                                                message.reply("You do not have the required role to use this command");
+                                            }
+                                        }
                                     }
                                     if ((minArgs !== undefined && args.length < minArgs) ||
                                         (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs)) {
@@ -168,7 +206,7 @@ var CommandHandler = /** @class */ (function () {
         }
     }
     CommandHandler.prototype.registerCommand = function (instance, client, file, fileName) {
-        var e_3, _a, e_4, _b;
+        var e_4, _a, e_5, _b;
         var configuration = require(file);
         var _c = configuration.name, name = _c === void 0 ? fileName : _c, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, run = configuration.run, desription = configuration.desription, requiredPermissions = configuration.requiredPermissions;
         var callbackCounter = 0;
@@ -200,12 +238,12 @@ var CommandHandler = /** @class */ (function () {
                     }
                 }
             }
-            catch (e_3_1) { e_3 = { error: e_3_1 }; }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
             finally {
                 try {
                     if (requiredPermissions_2_1 && !requiredPermissions_2_1.done && (_a = requiredPermissions_2.return)) _a.call(requiredPermissions_2);
                 }
-                finally { if (e_3) throw e_3.error; }
+                finally { if (e_4) throw e_4.error; }
             }
         }
         if (!desription) {
@@ -220,78 +258,115 @@ var CommandHandler = /** @class */ (function () {
                     this._commands.set(name_2.toLowerCase(), command);
                 }
             }
-            catch (e_4_1) { e_4 = { error: e_4_1 }; }
+            catch (e_5_1) { e_5 = { error: e_5_1 }; }
             finally {
                 try {
                     if (names_1_1 && !names_1_1.done && (_b = names_1.return)) _b.call(names_1);
                 }
-                finally { if (e_4) throw e_4.error; }
+                finally { if (e_5) throw e_5.error; }
             }
         }
     };
     Object.defineProperty(CommandHandler.prototype, "commands", {
         get: function () {
             var results = [];
+            var added = [];
             this._commands.forEach(function (_a) {
+                // results.push({
+                //     names: [...names] ,
+                //     description
+                // })
                 var names = _a.names, _b = _a.description, description = _b === void 0 ? '' : _b;
-                results.push({
-                    names: __spreadArray([], __read(names), false),
-                    description: description
-                });
+                if (!added.includes(names[0])) {
+                    results.push({
+                        names: __spreadArray([], __read(names), false),
+                        description: description,
+                    });
+                    added.push(names[0]);
+                }
             });
             return results;
         },
         enumerable: false,
         configurable: true
     });
+    CommandHandler.prototype.getCommand = function (name) {
+        return this._commands.get(name);
+    };
     CommandHandler.prototype.fetchDisabledCommands = function () {
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var results, results_1, results_1_1, result, guildId, command, array;
-            var e_5, _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var results, results_1, results_1_1, result, guildId, command;
+            var e_6, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0: return [4 /*yield*/, disabled_commands_1.default.find({})];
                     case 1:
-                        results = _b.sent();
+                        results = _c.sent();
                         try {
                             for (results_1 = __values(results), results_1_1 = results_1.next(); !results_1_1.done; results_1_1 = results_1.next()) {
                                 result = results_1_1.value;
                                 guildId = result.guildId, command = result.command;
-                                array = this._disabled.get(guildId) || [];
-                                array.push(command);
-                                this._disabled.set(guildId, array);
+                                // const array = this._disabled.get(guildId) || []
+                                // array.push(command)
+                                // this._disabled.set(guildId , array)
+                                (_a = this._commands.get(command)) === null || _a === void 0 ? void 0 : _a.disable(guildId);
                             }
                         }
-                        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+                        catch (e_6_1) { e_6 = { error: e_6_1 }; }
                         finally {
                             try {
-                                if (results_1_1 && !results_1_1.done && (_a = results_1.return)) _a.call(results_1);
+                                if (results_1_1 && !results_1_1.done && (_b = results_1.return)) _b.call(results_1);
                             }
-                            finally { if (e_5) throw e_5.error; }
+                            finally { if (e_6) throw e_6.error; }
                         }
-                        console.log("[CommandHandler] Fetched " + results.length + " disabled commands");
                         return [2 /*return*/];
                 }
             });
         });
     };
-    CommandHandler.prototype.disableCommand = function (guildId, command) {
-        var array = this._disabled.get(guildId) || [];
-        if (array && !array.includes(command)) {
-            array.push(command);
-            this._disabled.set(guildId, array);
-        }
-    };
-    CommandHandler.prototype.isCommandDisabled = function (guildId, command) {
-        var array = this._disabled.get(guildId);
-        return (array && array.includes(command)) || false;
-    };
-    CommandHandler.prototype.enableCommand = function (guildId, command) {
-        var array = this._disabled.get(guildId) || [];
-        var index = array ? array.indexOf(command) : -1;
-        if (array && index >= 0) {
-            array.splice(index, 1);
-        }
+    CommandHandler.prototype.fetchRequiredRoles = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var results, results_2, results_2_1, result, guildId, command, requiredRoles_2, cmd, requiredRoles_1, requiredRoles_1_1, roleId;
+            var e_7, _a, e_8, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0: return [4 /*yield*/, required_roles_1.default.find()];
+                    case 1:
+                        results = _c.sent();
+                        try {
+                            for (results_2 = __values(results), results_2_1 = results_2.next(); !results_2_1.done; results_2_1 = results_2.next()) {
+                                result = results_2_1.value;
+                                guildId = result.guildId, command = result.command, requiredRoles_2 = result.requiredRoles;
+                                cmd = this._commands.get(command);
+                                if (cmd) {
+                                    try {
+                                        for (requiredRoles_1 = (e_8 = void 0, __values(requiredRoles_2)), requiredRoles_1_1 = requiredRoles_1.next(); !requiredRoles_1_1.done; requiredRoles_1_1 = requiredRoles_1.next()) {
+                                            roleId = requiredRoles_1_1.value;
+                                            cmd.addRequiredRole(guildId, roleId);
+                                        }
+                                    }
+                                    catch (e_8_1) { e_8 = { error: e_8_1 }; }
+                                    finally {
+                                        try {
+                                            if (requiredRoles_1_1 && !requiredRoles_1_1.done && (_b = requiredRoles_1.return)) _b.call(requiredRoles_1);
+                                        }
+                                        finally { if (e_8) throw e_8.error; }
+                                    }
+                                }
+                            }
+                        }
+                        catch (e_7_1) { e_7 = { error: e_7_1 }; }
+                        finally {
+                            try {
+                                if (results_2_1 && !results_2_1.done && (_a = results_2.return)) _a.call(results_2);
+                            }
+                            finally { if (e_7) throw e_7.error; }
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     return CommandHandler;
 }());

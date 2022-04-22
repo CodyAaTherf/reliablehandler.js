@@ -12,7 +12,9 @@ class Command {
     private _expectedArgs?: string
     private _description?: string
     private _requiredPermissions?: string[] = []
+    private _requiredRoles?: Map<String , string[]> = new Map()
     private _callback: Function = () => {}
+    private _disabled: string[] = []
 
     constructor(
         instance: ReliableHandler ,
@@ -81,6 +83,47 @@ class Command {
 
     public get requiredPermissions(): string[] | undefined {
         return this._requiredPermissions
+    }
+
+    public addRequiredRole(guildId: string , roleId: string){
+        const array = this._requiredRoles?.get(guildId) || []
+
+        if(!array.includes(roleId)){
+            array.push(roleId)
+            this._requiredRoles?.set(guildId , array)
+
+            console.log(`[Command] Added required role ${roleId} to ${guildId}`);
+        }
+    }
+
+    public removeRequiredRole(guildId: string , roleId: string){
+        const array = this._requiredRoles?.get(guildId) || []
+        const index = array ? array.indexOf(roleId) : -1
+
+        if(array && index >= 0){
+            array.splice(index , 1)
+
+            console.log(`[Command] Removed required role ${roleId} from ${guildId}`);
+        }
+    }
+
+    public getRequiredRoles(guildId: string): string[]{
+        const map = this._requiredRoles || new Map()
+        return map.get(guildId) || []
+    }
+
+    public disable(guildId: string){
+        this._disabled.push(guildId)
+    }
+
+    public enable(guildId: string){
+        if(!this._disabled.includes(guildId)){
+            this._disabled.push(guildId)
+        }
+    }
+
+    public isDisabled(guildId: string){
+        return this._disabled.includes(guildId)
     }
 
     public get callback(): Function {

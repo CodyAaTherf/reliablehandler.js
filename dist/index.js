@@ -68,7 +68,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var path_1 = __importDefault(require("path"));
 var CommandHandler_1 = __importDefault(require("./CommandHandler"));
 var mongo_1 = __importDefault(require("./mongo"));
-var prefixes_1 = __importDefault(require("./modles/prefixes"));
+var prefixes_1 = __importDefault(require("./models/prefixes"));
 var get_all_files_1 = __importDefault(require("./get-all-files"));
 var ReliableHandler = /** @class */ (function () {
     function ReliableHandler(client, commandsDir, listenerDir) {
@@ -195,20 +195,6 @@ var ReliableHandler = /** @class */ (function () {
     Object.defineProperty(ReliableHandler.prototype, "commandHandler", {
         get: function () {
             return this._commandHandler;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ReliableHandler.prototype, "commands", {
-        get: function () {
-            return this._commandHandler.commands;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ReliableHandler.prototype, "commandAmount", {
-        get: function () {
-            return this.commands.length;
         },
         enumerable: false,
         configurable: true

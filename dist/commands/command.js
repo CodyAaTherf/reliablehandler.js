@@ -35,102 +35,92 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-var disabled_commands_1 = __importDefault(require("../modles/disabled-commands"));
 module.exports = {
     minArgs: 2,
     maxArgs: 2,
     expectedArgs: '<"enable"|"disable"> <command>',
+    requiredPermissions: ['ADMINISTRATOR'],
     description: 'Enables or disables a command for this server',
     callback: function (message, args, text, client, prefix, instance) { return __awaiter(void 0, void 0, void 0, function () {
-        var newState, name, guild, _a, _b, names, mainCommand, isDisabled, e_1_1;
-        var e_1, _c;
-        var _d, _e;
-        return __generator(this, function (_f) {
-            switch (_f.label) {
-                case 0:
-                    newState = (_d = args.shift()) === null || _d === void 0 ? void 0 : _d.toLowerCase();
-                    name = (_e = args.shift()) === null || _e === void 0 ? void 0 : _e.toLowerCase();
-                    if (newState !== 'enable' && newState !== 'disable') {
-                        message.reply('Please provide a valid state');
-                        return [2 /*return*/];
-                    }
-                    guild = message.guild;
-                    if (!guild) {
-                        message.reply('This command can only be used in a guild');
-                        return [2 /*return*/];
-                    }
-                    _f.label = 1;
-                case 1:
-                    _f.trys.push([1, 9, 10, 11]);
-                    _a = __values(instance.commands), _b = _a.next();
-                    _f.label = 2;
-                case 2:
-                    if (!!_b.done) return [3 /*break*/, 8];
-                    names = _b.value.names;
-                    if (!names.includes(name)) return [3 /*break*/, 7];
-                    mainCommand = names[0];
-                    isDisabled = instance.commandHandler.isCommandDisabled(guild.id, mainCommand);
-                    if (!(newState === 'enable')) return [3 /*break*/, 4];
-                    if (!isDisabled) {
-                        message.reply('This command is already enabled');
-                        return [2 /*return*/];
-                    }
-                    return [4 /*yield*/, disabled_commands_1.default.deleteOne({
-                            guildId: guild.id,
-                            command: mainCommand,
-                        })];
-                case 3:
-                    _f.sent();
-                    instance.commandHandler.enableCommand(guild.id, mainCommand);
-                    message.reply('Command enabled');
-                    return [3 /*break*/, 6];
-                case 4:
-                    if (isDisabled) {
-                        message.reply('This command is already disabled');
-                        return [2 /*return*/];
-                    }
-                    return [4 /*yield*/, new disabled_commands_1.default({
-                            guildId: guild.id,
-                            command: mainCommand,
-                        }).save()];
-                case 5:
-                    _f.sent();
-                    instance.commandHandler.disableCommand(guild.id, mainCommand);
-                    message.reply('Command disabled');
-                    _f.label = 6;
-                case 6: return [2 /*return*/];
-                case 7:
-                    _b = _a.next();
-                    return [3 /*break*/, 2];
-                case 8: return [3 /*break*/, 11];
-                case 9:
-                    e_1_1 = _f.sent();
-                    e_1 = { error: e_1_1 };
-                    return [3 /*break*/, 11];
-                case 10:
-                    try {
-                        if (_b && !_b.done && (_c = _a.return)) _c.call(_a);
-                    }
-                    finally { if (e_1) throw e_1.error; }
-                    return [7 /*endfinally*/];
-                case 11:
-                    message.reply('Command not found');
-                    return [2 /*return*/];
+        var newState, name, guild;
+        var _a;
+        return __generator(this, function (_b) {
+            newState = (_a = args.shift()) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+            name = (args.shift() || '').toLowerCase();
+            if (newState !== 'enable' && newState !== 'disable') {
+                message.reply('Please provide a valid state');
+                return [2 /*return*/];
             }
+            guild = message.guild;
+            if (!guild) {
+                message.reply('This command can only be used in a guild');
+                return [2 /*return*/];
+            }
+            // for(const { names } of instance.commandHandler.commands){
+            //     // @ts-ignore
+            //     if(names.includes(name)){
+            //         const mainCommand = names[0]
+            //         const isDisabled = instance.commandHandler.isCommandDisabled(guild.id , mainCommand)
+            //         if(newState === 'enable'){
+            //             if(!isDisabled){
+            //                 message.reply('This command is already enabled')
+            //                 return
+            //             }
+            //             await disabledCommands.deleteOne({
+            //                 guildId: guild.id ,
+            //                 command: mainCommand ,
+            //             })
+            //             instance.commandHandler.enableCommand(guild.id , mainCommand)
+            //             message.reply('Command enabled')
+            //         } else {
+            //             if(isDisabled){
+            //                 message.reply('This command is already disabled')
+            //                 return
+            //             }
+            //             await new disabledCommands({
+            //                 guildId: guild.id ,
+            //                 command: mainCommand ,
+            //             }).save()
+            //             instance.commandHandler.disableCommand(guild.id , mainCommand)
+            //             message.reply('Command disabled')
+            //         }
+            //         return
+            //     }
+            // }
+            // -------------------------------------------------
+            // const command = instance.commandHandler.getCommand(name)
+            // // const command = this._commands.get(name)
+            // if(!command){
+            //     const mainCommand = command.names[0]
+            //     const isDisabled = command.isDisabled(guild.id)
+            //     if(newState === 'enable'){
+            //         if(!isDisabled){
+            //             message.reply('This command is already enabled')
+            //             return
+            //         }
+            //         await disabledCommands.deleteOne({
+            //             guildId: guild.id ,
+            //             command: mainCommand ,
+            //         })
+            //         command.enable(guild.id)
+            //         message.reply('Command enabled')
+            //     } else {
+            //         if(isDisabled){
+            //             message.reply('This command is already disabled')
+            //             return
+            //         }
+            //         await new disabledCommands({
+            //             guildId: guild.id ,
+            //             command: mainCommand ,
+            //         }).save()
+            //         command.disable(guild.id)
+            //         message.reply('Command disabled')
+            //     }
+            // } else{
+            //     message.reply('This command does not exist')
+            // }
+            message.reply('Command not found');
+            return [2 /*return*/];
         });
     }); }
 };

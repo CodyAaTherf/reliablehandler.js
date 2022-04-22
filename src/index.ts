@@ -2,9 +2,8 @@ import { Client , Guild } from 'discord.js'
 import path from 'path'
 
 import CommandHandler from './CommandHandler'
-import ICommand from './interfaces/ICommand'
 import mongo from './mongo'
-import prefixes from './modles/prefixes'
+import prefixes from './models/prefixes'
 import getAllFiles from './get-all-files'
 
 class ReliableHandler {
@@ -104,14 +103,6 @@ class ReliableHandler {
 
     public get commandHandler(): CommandHandler {
         return this._commandHandler
-    }
-
-    public get commands(): ICommand[]{
-        return this._commandHandler.commands
-    }
-
-    public get commandAmount(): number{
-        return this.commands.length
     }
 }
 

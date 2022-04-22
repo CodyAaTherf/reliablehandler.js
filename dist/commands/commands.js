@@ -17,15 +17,24 @@ module.exports = {
         var e_1, _a;
         var msg = "Commands: \n";
         try {
-            for (var _b = __values(instance.commands), _c = _b.next(); !_c.done; _c = _b.next()) {
+            for (var _b = __values(instance.commandHandler.commands), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var command = _c.value;
                 var names = command.names, description = command.description;
                 var mainCommand = names.shift() || '';
-                msg += "\n                **" + mainCommand + "**\n                Aliases: " + (names.length ? "\"" + names.join('" , "') + "\"" : 'None') + "\n                Description: " + (description || 'None') + "\n                Enabled: " + (message.guild
-                    ? instance.commandHandler.isCommandDisabled(message.guild.id, mainCommand)
-                        ? 'No'
-                        : 'Yes'
-                    : '') + "\n            ";
+                // msg += `
+                // **${mainCommand}**
+                // Aliases: ${names.length ? `"${names.join('" , "')}"` : 'None'}
+                // Description: ${description || 'None'}
+                // Enabled: ${
+                //     message.guild
+                //         ? instance.commandHandler
+                //         .getCommand(mainCommand)
+                //         ?.isDisabled(message.guild.id)
+                //             ? 'No'
+                //             ? 'Yes'
+                //         : ''
+                //     }
+                // `                
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }

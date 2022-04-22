@@ -1,12 +1,13 @@
 import { Client , Message } from 'discord.js'
 import ReliableHandler from '..'
-import prefixes from '../modles/prefixes'
+import prefixes from '../models/prefixes'
 
 export = {
     name: 'prefix' ,
     minArgs: 0 ,
     maxArgs: 1 ,
     expectedArgss: '<prefix>' ,
+    requiredPermissions: ['ADMINISTRATOR'] ,
     description: 'Changes the prefix for this server' ,
     callback: async(
         message: Message ,
