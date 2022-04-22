@@ -1,15 +1,6 @@
-import { Client , GuildMember , Message } from 'discord.js'
+import { Client , Message } from 'discord.js'
 import ReliableHandler from "."
 import ICommandConfig from './interfaces/ICommandConfig'
-
-// interface configuration{
-//     names: string[] | string
-//     minArgs?: number
-//     maxArgs?: number
-//     expectedArgs: string
-//     description?: string
-//     callback: Function
-// }
 
 class Command {
     private instance: ReliableHandler
@@ -20,15 +11,17 @@ class Command {
     private _syntaxError?: string
     private _expectedArgs?: string
     private _description?: string
-    private _cooldown: string[] = []
+    private _requiredPermissions?: string[] = []
+    private _requiredRoles?: Map<String , string[]> = new Map()
     private _callback: Function = () => {}
+    private _disabled: string[] = []
 
     constructor(
         instance: ReliableHandler ,
         client: Client ,
         names: string ,
         callback: Function ,
-        { minArgs , maxArgs , syntaxError , description }: ICommandConfig
+        { minArgs , maxArgs , syntaxError , description , requiredPermissions }: ICommandConfig
     ){
         this.instance = instance
         this.client = client
@@ -37,6 +30,7 @@ class Command {
         this._maxArgs = maxArgs === undefined ? -1 : maxArgs
         this._syntaxError = syntaxError
         this._description = description
+        this._requiredPermissions = requiredPermissions
         this._callback = callback
 
         if(this._minArgs < 0){
@@ -87,24 +81,64 @@ class Command {
         return this._description
     }
 
-    public setCooldown(member: GuildMember | string , seconds: number){
-        if(typeof member !== 'string'){
-            member = member.id
-        }
-
-        console.log(`[Command] Setting cooldown for ${member} for ${seconds} seconds`);
+    public get requiredPermissions(): string[] | undefined {
+        return this._requiredPermissions
     }
 
-    public clearCooldown(member: GuildMember | string , seconds: number){
-        if(typeof member !== 'string'){
-            member = member.id
-        }
+    public addRequiredRole(guildId: string , roleId: string){
+        const array = this._requiredRoles?.get(guildId) || []
 
-        console.log(`[Command] Clearing cooldown for ${member} for ${seconds} seconds`);         
+        if(!array.includes(roleId)){
+            array.push(roleId)
+            this._requiredRoles?.set(guildId , array)
+
+            console.log(`[Command] Added required role ${roleId} to ${guildId}`);
+        }
     }
 
-    public get callback(): Function {
-        return this._callback
+    public removeRequiredRole(guildId: string , roleId: string){
+        if(roleId === 'none'){
+            this._requiredRoles?.delete(guildId)
+            return
+        }
+
+        const array = this._requiredRoles?.get(guildId) || []
+        const index = array ? array.indexOf(roleId) : -1
+
+        if(array && index >= 0){
+            array.splice(index , 1)
+
+            console.log(`[Command] Removed required role ${roleId} from ${guildId}`);
+        }
+    }
+
+    public getRequiredRoles(guildId: string): string[]{
+        const map = this._requiredRoles || new Map()
+        return map.get(guildId) || []
+    }
+
+    public disable(guildId: string){
+        // this._disabled.push(guildId)
+        
+        if(!this._disabled.includes(guildId)){
+            this._disabled.push(guildId)
+        }
+    }
+
+    public enable(guildId: string){
+        // if(!this._disabled.includes(guildId)){
+        //     this._disabled.push(guildId)
+
+        const index = this._disabled.indexOf(guildId)
+
+        if(index >= 0){
+            this._disabled.splice(index , 1)
+        }
+        
+    }
+
+    public isDisabled(guildId: string){
+        return this._disabled.includes(guildId)
     }
 }
 

@@ -5,5 +5,6 @@ export default interface ICommandConfig {
     expectedArgs?: string
     syntaxError?: string
     description?: string
+    requiredPermissions?: string[]
     callback: Function
 }

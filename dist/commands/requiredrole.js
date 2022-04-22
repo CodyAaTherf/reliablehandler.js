@@ -38,43 +38,63 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var prefixes_1 = __importDefault(require("../models/prefixes"));
+var required_roles_1 = __importDefault(require("../models/required-roles"));
 module.exports = {
-    name: 'prefix',
-    minArgs: 0,
-    maxArgs: 1,
-    expectedArgss: '<prefix>',
-    requiredPermissions: ['ADMINISTRATOR'],
-    description: 'Changes the prefix for this server',
-    callback: function (message, args, text, client, prefix, instance) { return __awaiter(void 0, void 0, void 0, function () {
-        var guild, id;
+    minArgs: 2,
+    maxArgs: 2,
+    expectedArgs: '<"none" | Role Name | roleId>',
+    requiredPermissions: ['ADMINISTATOR'],
+    description: 'Add a required role to a command',
+    callback: function (message, args, text, prefix, client, instance) { return __awaiter(void 0, void 0, void 0, function () {
+        var name, roleId, guild, command;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!(args.length === 0)) return [3 /*break*/, 1];
-                    message.reply("My prefix is `" + prefix + "`");
-                    return [3 /*break*/, 4];
-                case 1:
+                    name = (args.shift() || '').toLowerCase();
+                    roleId = message.mentions.users.first() || (args.shift() || '').toLowerCase();
+                    if (typeof roleId !== 'string') {
+                        roleId = roleId.id;
+                    }
                     guild = message.guild;
-                    if (!guild) return [3 /*break*/, 3];
-                    id = guild.id;
-                    return [4 /*yield*/, prefixes_1.default.findOneAndUpdate({
-                            _id: id,
-                        }, {
-                            _id: id,
-                            prefix: text,
-                        }, {
-                            upsert: true,
+                    if (!guild) {
+                        message.reply('This command can only be used in a guild');
+                        return [2 /*return*/];
+                    }
+                    command = instance.commandHandler.getCommand(name);
+                    if (!command) return [3 /*break*/, 5];
+                    if (!(roleId === 'none')) return [3 /*break*/, 2];
+                    command.removeRequiredRole(guild.id, roleId);
+                    return [4 /*yield*/, required_roles_1.default.deleteOne({
+                            guildId: guild.id,
+                            command: command.names[0]
                         })];
-                case 2:
+                case 1:
                     _a.sent();
-                    instance.setPrefix(guild, text);
-                    message.reply("My new prefix is `" + text + "`");
+                    message.reply("Removed required role from " + name);
                     return [3 /*break*/, 4];
+                case 2:
+                    command.addRequiredRole(guild.id, roleId);
+                    return [4 /*yield*/, required_roles_1.default.findOneAndUpdate({
+                            guildId: guild.id,
+                            command: command.names[0]
+                        }, {
+                            guildId: guild.id,
+                            command: command.names[0],
+                            $addToSet: {
+                                requiredRoles: roleId
+                            }
+                        }, {
+                            upsert: true
+                        })];
                 case 3:
-                    message.reply('You cannot change my prefix in DMs');
+                    _a.sent();
+                    message.reply("Added required role to " + name);
                     _a.label = 4;
-                case 4: return [2 /*return*/];
+                case 4: return [3 /*break*/, 6];
+                case 5:
+                    message.reply("Command " + name + " does not exist");
+                    _a.label = 6;
+                case 6: return [2 /*return*/];
             }
         });
     }); }
