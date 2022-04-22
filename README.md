@@ -98,7 +98,7 @@ maxArgs: -1 // -1 is no limit
 
 # Syntax Errors
 
-Most of the times the Syntax Errors will be same. You can speficy a common syntax error for all the commands using -
+Most of the times the Syntax Errors will be same. You can specify a common syntax error for all the commands using -
 
 ```js
 new ReliableHandler(client)
@@ -109,7 +109,7 @@ If you've speficied syntax error in the command , it will override the global sy
 
 # Required Permssions
 
-For example: If you are using a ban command , you would want the person using the `BAN MEMBERS` permission. To speficy that you can do so -
+For example: If you are using a ban command , you would want the person using the command have the `BAN MEMBERS` permission. To specify that you can do so -
 
 ```js
 module.exports = {
