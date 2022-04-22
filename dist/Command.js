@@ -90,8 +90,12 @@ var Command = /** @class */ (function () {
         }
     };
     Command.prototype.removeRequiredRole = function (guildId, roleId) {
-        var _a;
-        var array = ((_a = this._requiredRoles) === null || _a === void 0 ? void 0 : _a.get(guildId)) || [];
+        var _a, _b;
+        if (roleId === 'none') {
+            (_a = this._requiredRoles) === null || _a === void 0 ? void 0 : _a.delete(guildId);
+            return;
+        }
+        var array = ((_b = this._requiredRoles) === null || _b === void 0 ? void 0 : _b.get(guildId)) || [];
         var index = array ? array.indexOf(roleId) : -1;
         if (array && index >= 0) {
             array.splice(index, 1);
@@ -103,23 +107,22 @@ var Command = /** @class */ (function () {
         return map.get(guildId) || [];
     };
     Command.prototype.disable = function (guildId) {
-        this._disabled.push(guildId);
-    };
-    Command.prototype.enable = function (guildId) {
+        // this._disabled.push(guildId)
         if (!this._disabled.includes(guildId)) {
             this._disabled.push(guildId);
+        }
+    };
+    Command.prototype.enable = function (guildId) {
+        // if(!this._disabled.includes(guildId)){
+        //     this._disabled.push(guildId)
+        var index = this._disabled.indexOf(guildId);
+        if (index >= 0) {
+            this._disabled.splice(index, 1);
         }
     };
     Command.prototype.isDisabled = function (guildId) {
         return this._disabled.includes(guildId);
     };
-    Object.defineProperty(Command.prototype, "callback", {
-        get: function () {
-            return this._callback;
-        },
-        enumerable: false,
-        configurable: true
-    });
     return Command;
 }());
 module.exports = Command;
